@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstring>
-#include <vector>
+
 #include <math.h>
 
 using namespace std;
@@ -16,6 +16,11 @@ public:
         return coordenadaAtual[1];
     }
 
+    void setPosicaoVeiculo(double posicaoX, double posicaoY)
+    {
+        coordenadaAtual[0] = posicaoX;
+        coordenadaAtual[1] = posicaoY;
+    }
     bool getStatus()
     {
         return status;
@@ -46,14 +51,7 @@ public:
         strcpy(placa, "");
         strcpy(modelo, "");
     }
-    void cadastrarVeiculo()
-    {
-        cout << "Digite a placa do veiculo: " << endl;
-        cin.ignore();
-        cin.getline(placa, 20);
-        cout << "Digite o modelo do veiculo: " << endl;
-        cin.getline(modelo, 20);
-    }
+
     void exibirVeiculo()
     {
         cout << "Placa: " << getPlaca() << endl;
@@ -69,23 +67,6 @@ public:
         this->coordenadaAtual[0] = coordenadaDestino[0];
         this->coordenadaAtual[1] = coordenadaDestino[1];
     }
-    void atualizarVeiculo(vector<Veiculo> &veiculos, char *placaProcurada)
-    {
-        for (auto &veiculo : veiculos)
-        {
-            if (strcmp(veiculo.getPlaca(), placaProcurada) == 0)
-            {
-                cout << "Novo modelo: ";
-                char novoModelo[20];
-                cin.ignore();
-                cin.getline(novoModelo, 20);
-                veiculo.setModelo(novoModelo);
-                cout << "Veiculo atualizado com sucesso";
-                return;
-            }
-        }
-        cout << "Veiculo placa " << placaProcurada << "nao encontrado.\n";
-    }
 
 private:
     double coordenadaAtual[2];
@@ -93,6 +74,96 @@ private:
     char placa[20];
     char modelo[20];
 };
+
+void cadastrarVeiculo(Veiculo *veiculos[], int &quantidade)
+{
+    double coordenadaX, coordenadaY;
+    if (quantidade >= 100)
+    {
+        cout << "Limite de veiculos atingido.\n";
+        return;
+    }
+
+    char placa[20], modelo[20];
+
+    cout << "Digite a placa do veiculo: ";
+
+    cin >> placa;
+
+    cout << "Digite o modelo do veiculo: ";
+    cin >> modelo;
+
+    cout << "Digite as coordenadas de onde o veiculo esta saindo: ";
+    cin >> coordenadaX;
+    cin >> coordenadaY;
+
+    veiculos[quantidade] = new Veiculo();
+    veiculos[quantidade]->setPlacaNova(placa);
+    veiculos[quantidade]->setModelo(modelo);
+    veiculos[quantidade]->setPosicaoVeiculo(coordenadaX, coordenadaY);
+    quantidade++;
+
+    cout << "Veiculo cadastrado com sucesso.\n";
+}
+
+void atualizarVeiculo(Veiculo *veiculos[], int quantidade)
+{
+    char placaProcurada[20];
+
+    cout << "Digite a placa do veiculo que voce deseja atualizar: ";
+    cin >> placaProcurada;
+    for (int i = 0; i < quantidade; i++)
+    {
+        if (strcmp(veiculos[i]->getPlaca(), placaProcurada) == 0)
+        {
+            cout << "Nova placa: ";
+            char novaPlaca[20];
+            cin.getline(novaPlaca, 20);
+            veiculos[i]->setPlacaNova(novaPlaca);
+            cout << "Placa atualizada com sucesso.\n";
+            return;
+        }
+    }
+    cout << "Veiculo placa " << placaProcurada << " nao encontrado.\n";
+}
+
+void excluirVeiculo(Veiculo *veiculos[], int &quantidade)
+{
+    char placaProcurada[20];
+
+    cout << "Digite a placa do veiculo que voce deseja atualizar: ";
+    cin >> placaProcurada;
+    for (int i = 0; i < quantidade; i++)
+    {
+        if (strcmp(veiculos[i]->getPlaca(), placaProcurada) == 0)
+        {
+            delete veiculos[i];
+            for (int j = i; j < quantidade - 1; j++)
+            {
+                veiculos[j] = veiculos[j + 1];
+            }
+            quantidade--;
+            cout << "Veiculo removido com sucesso.\n";
+            return;
+        }
+    }
+    cout << "Veiculo nao encontrado.\n";
+}
+
+void listarVeiculos(Veiculo *veiculos[], int quantidade)
+{
+    if (quantidade == 0)
+    {
+        cout << "Nenhum veiculo cadastrado.\n";
+        return;
+    }
+
+    for (int i = 0; i < quantidade; i++)
+    {
+        veiculos[i]->exibirVeiculo();
+    }
+}
+
 class CentroDistribuicao
 {
 public:
@@ -120,26 +191,113 @@ public:
         strcpy(nomeLocal, "");
     }
 
-    void cadastrarCentro()
-    {
-        cout << "Digite o nome do local: " << endl;
-        cin.ignore();
-        cin.getline(nomeLocal, 20);
-        cout << "Digite a coordenada X: " << endl;
-        cin >> coordenadaOrigem[0];
-        cout << "Digite a coordenada Y: " << endl;
-        cin >> coordenadaOrigem[1];
-    }
     void exibirCentro()
     {
         cout << "Nome local: " << nomeLocal << endl;
         cout << "Coordenada X: " << coordenadaOrigem[0] << " Y: " << coordenadaOrigem[1] << endl;
+    }
+    void setCoordenadas(double x, double y)
+    {
+        coordenadaOrigem[0] = x;
+        coordenadaOrigem[1] = y;
     }
 
 private:
     double coordenadaOrigem[2];
     char nomeLocal[20];
 };
+
+void cadastrarCentro(CentroDistribuicao *centros[], int &quantidade)
+{
+    if (quantidade >= 100)
+    {
+        cout << "Limite de centros atingido.\n";
+        return;
+    }
+
+    char nome[20];
+    double x, y;
+
+    cout << "Digite o nome do centro: ";
+    cin.ignore();
+    cin.getline(nome, 20);
+
+    cout << "Digite a coordenada X: ";
+    cin >> x;
+
+    cout << "Digite a coordenada Y: ";
+    cin >> y;
+
+    CentroDistribuicao *novoCentro = new CentroDistribuicao();
+    novoCentro->setNovoLocal(nome);
+
+    novoCentro->setCoordenadas(x, y);
+
+    centros[quantidade] = novoCentro;
+    quantidade++;
+
+    cout << "Centro cadastrado com sucesso.\n";
+}
+
+void listarCentros(CentroDistribuicao *centros, int quantidade)
+{
+
+    for (int i = 0; i < quantidade; i++)
+    {
+        cout << "Centro [" << i + 1 << "]";
+        centros[i].exibirCentro();
+    }
+}
+
+void excluirCentro(CentroDistribuicao *centros[], int &quantidade)
+{
+
+    char nomeProcurado[20];
+    cout << "Digite o nome do centro que deseja excluir: ";
+    cin.ignore();
+    cin.getline(nomeProcurado, 20);
+
+    for (int i = 0; i < quantidade; i++)
+    {
+        if (strcmp(centros[i]->getNomeLocal(), nomeProcurado) == 0)
+        {
+            delete centros[i];
+            for (int j = i; j < quantidade - 1; j++)
+            {
+                centros[j] = centros[j + 1];
+            }
+            quantidade--;
+            cout << "Centro removido com sucesso.\n";
+            return;
+        }
+    }
+    cout << "Centro com nome \"" << nomeProcurado << "\" nao encontrado.\n";
+}
+
+void atualizarCentro(CentroDistribuicao *centros[], int quantidade)
+{
+    char nomeProcurado[20];
+
+    cout << "Digite o nome do centro que deseja atualizar: ";
+    cin.ignore();
+    cin.getline(nomeProcurado, 20);
+
+    for (int i = 0; i < quantidade; i++)
+    {
+        if (strcmp(centros[i]->getNomeLocal(), nomeProcurado) == 0)
+        {
+            char novoNome[20];
+            cout << "Digite o novo nome do centro: ";
+            cin.getline(novoNome, 20);
+            centros[i]->setNovoLocal(novoNome);
+            cout << "Centro atualizado com sucesso.\n";
+            return;
+        }
+    }
+
+    cout << "Centro com nome \"" << nomeProcurado << "\" nao encontrado.\n";
+}
+
 class Pedido
 {
 public:
@@ -206,22 +364,42 @@ public:
         }
         return veiculosMaisProximo;
     }
-    void criarPedido()
-    {
-        cout << "Digite o id: " << endl;
-        cin.getline(idUnico, 20);
-        cin.ignore();
-        cout << "Digite as coordenadas de destino (X E Y): " << endl;
-        cin >> coordenadaDestino[0];
-        cin >> coordenadaDestino[1];
-        cout << "Digite o peso do item: " << endl;
-        cin >> pesoDoItem;
-    }
+
     void exibirPedido()
     {
         cout << "Id: " << getIdUnico() << endl;
         cout << "Coordenadas: X: " << getDestinoX() << " Y: " << getDestinoY() << endl;
         cout << "Peso: " << getPeso() << endl;
+    }
+
+    void atualizarPedido(Pedido *pedidos[], int quantidade)
+    {
+        char idProcurado[20];
+
+        cout << "Digite o ID do pedido que deseja atualizar: ";
+        cin.ignore();
+        cin.getline(idProcurado, 20);
+
+        for (int i = 0; i < quantidade; i++)
+        {
+            if (strcmp(pedidos[i]->getIdUnico(), idProcurado) == 0)
+            {
+                double novoPeso, novoX, novoY;
+                cout << "Digite o novo peso do item: ";
+                cin >> novoPeso;
+
+                cout << "Digite as novas coordenadas de destino (X e Y): ";
+                cin >> novoX >> novoY;
+
+                pedidos[i]->setPeso(novoPeso);
+                pedidos[i]->setDestino(novoX, novoY);
+
+                cout << "Pedido atualizado com sucesso.\n";
+                return;
+            }
+        }
+
+        cout << "Pedido com ID \"" << idProcurado << "\" nao encontrado.\n";
     }
 
 private:
@@ -250,7 +428,164 @@ private:
     }
 };
 
+void criarPedido(Pedido *pedidos[], int &quantidade)
+{
+    if (quantidade >= 100)
+    {
+        cout << "Limite de pedidos atingido.\n";
+        return;
+    }
+
+    Pedido *novoPedido = new Pedido();
+
+    char id[20];
+    double x, y, peso;
+
+    cout << "Digite o ID do pedido: ";
+    cin.ignore();
+    cin.getline(id, 20);
+
+    cout << "Digite as coordenadas de destino (X e Y): ";
+    cin >> x >> y;
+
+    cout << "Digite o peso do item: ";
+    cin >> peso;
+
+    novoPedido->setIdUnico(id);
+    novoPedido->setDestino(x, y);
+    novoPedido->setPeso(peso);
+
+    pedidos[quantidade] = novoPedido;
+    quantidade++;
+
+    cout << "Pedido criado com sucesso.\n";
+}
+
+void excluirPedido(Pedido *pedidos[], int &quantidade)
+{
+    if (quantidade == 0)
+    {
+        cout << "Nenhum pedido cadastrado.\n";
+        return;
+    }
+
+    char idProcurado[20];
+    cout << "Digite o ID do pedido que deseja excluir: ";
+    cin.ignore();
+    cin.getline(idProcurado, 20);
+
+    for (int i = 0; i < quantidade; i++)
+    {
+        if (strcmp(pedidos[i]->getIdUnico(), idProcurado) == 0)
+        {
+            delete pedidos[i];
+
+            for (int j = i; j < quantidade - 1; j++)
+            {
+                pedidos[j] = pedidos[j + 1];
+            }
+
+            quantidade--;
+            cout << "Pedido removido com sucesso.\n";
+            return;
+        }
+    }
+
+    cout << "Pedido com ID \"" << idProcurado << "\" nao encontrado.\n";
+}
+
+void listarPedido(Pedido *pedidos, int quantidade)
+{
+
+    for (int i = 0; i < quantidade; i++)
+    {
+        cout << "Pedidos [" << i + 1 << "]";
+        pedidos[i].exibirPedido();
+    }
+}
+
 int main()
 {
-    Veiculo veiculos[100];
+    Veiculo *veiculos[100];
+    CentroDistribuicao *centros[100];
+    Pedido *pedidos[100];
+    int qtdVeiculos = 0, qtdCentros = 0, qtdPedidos = 0;
+
+    int opcao;
+    do
+    {
+        cout << "\n--- MENU ---" << endl;
+        cout << "1. Cadastrar Veiculo" << endl;
+        cout << "2. Atualizar Veiculo" << endl;
+        cout << "3. Excluir Veiculo" << endl;
+        cout << "4. Listar Veiculos" << endl;
+        cout << "5. Cadastrar Centro" << endl;
+        cout << "6. Atualizar Centro" << endl;
+        cout << "7. Excluir Centro" << endl;
+        cout << "8. Listar Centros" << endl;
+        cout << "9. Criar Pedido" << endl;
+        cout << "10. Atualizar Pedido" << endl;
+        cout << "11. Excluir Pedido" << endl;
+        cout << "12. Listar Pedidos" << endl;
+        cout << "0. Sair" << endl;
+        cout << "Escolha uma opcao: ";
+        cin >> opcao;
+
+        switch (opcao)
+        {
+        case 1:
+            cadastrarVeiculo(veiculos, qtdVeiculos);
+            break;
+        case 2:
+            atualizarVeiculo(veiculos, qtdVeiculos);
+            break;
+        case 3:
+            excluirVeiculo(veiculos, qtdVeiculos);
+            break;
+        case 4:
+            listarVeiculos(veiculos, qtdVeiculos);
+            break;
+        case 5:
+            cadastrarCentro(centros, qtdCentros);
+            break;
+        case 6:
+            atualizarCentro(centros, qtdCentros);
+            break;
+        case 7:
+            excluirCentro(centros, qtdCentros);
+            break;
+        case 8:
+            listarCentros(*centros, qtdCentros);
+            break;
+        case 9:
+            criarPedido(pedidos, qtdPedidos);
+            break;
+        case 10:
+        {
+            Pedido p;
+            p.atualizarPedido(pedidos, qtdPedidos);
+            break;
+        }
+        case 11:
+            excluirPedido(pedidos, qtdPedidos);
+            break;
+        case 12:
+            listarPedido(*pedidos, qtdPedidos);
+            break;
+        case 0:
+            cout << "Encerrando programa...\n";
+            break;
+        default:
+            cout << "Opcao invalida.\n";
+        }
+    } while (opcao != 0);
+
+    for (int i = 0; i < qtdVeiculos; i++)
+        delete veiculos[i];
+    for (int i = 0; i < qtdCentros; i++)
+        delete centros[i];
+    for (int i = 0; i < qtdPedidos; i++)
+        delete pedidos[i];
+
+    return 0;
 }
