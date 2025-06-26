@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <vector>
 #include <math.h>
 
 using namespace std;
@@ -67,6 +68,23 @@ public:
         this->status = 0;
         this->coordenadaAtual[0] = coordenadaDestino[0];
         this->coordenadaAtual[1] = coordenadaDestino[1];
+    }
+    void atualizarVeiculo(vector<Veiculo> &veiculos, char *placaProcurada)
+    {
+        for (auto &veiculo : veiculos)
+        {
+            if (strcmp(veiculo.getPlaca(), placaProcurada) == 0)
+            {
+                cout << "Novo modelo: ";
+                char novoModelo[20];
+                cin.ignore();
+                cin.getline(novoModelo, 20);
+                veiculo.setModelo(novoModelo);
+                cout << "Veiculo atualizado com sucesso";
+                return;
+            }
+        }
+        cout << "Veiculo placa " << placaProcurada << "nao encontrado.\n";
     }
 
 private:
@@ -183,7 +201,7 @@ public:
             {
                 distanciaMinima = distanciaCalculada;
                 veiculosMaisProximo = veiculo;
-                this->veiculoMaisProximo = veiculo; // <-- atualiza o atributo da classe
+                this->veiculoMaisProximo = veiculo;
             }
         }
         return veiculosMaisProximo;
