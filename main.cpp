@@ -4,166 +4,6 @@
 #include <math.h>
 
 using namespace std;
-class Veiculo
-{
-public:
-    double getPosicaoAtualVeiculoX()
-    {
-        return coordenadaAtual[0];
-    }
-    double getPosicaoAtualVeiculoY()
-    {
-        return coordenadaAtual[1];
-    }
-
-    void setPosicaoVeiculo(double posicaoX, double posicaoY)
-    {
-        coordenadaAtual[0] = posicaoX;
-        coordenadaAtual[1] = posicaoY;
-    }
-    bool getStatus()
-    {
-        return status;
-    }
-    char *getPlaca()
-    {
-        return placa;
-    }
-    void setPlacaNova(char *placaNova)
-    {
-        strncpy(placa, placaNova, sizeof(placa) - 1);
-        placa[sizeof(placa) - 1] = '\0';
-    }
-    char *getModelo()
-    {
-        return modelo;
-    }
-    void setModelo(const char *modeloNovo)
-    {
-        strncpy(modelo, modeloNovo, sizeof(modelo) - 1);
-        modelo[sizeof(modelo) - 1] = '\0';
-    }
-    Veiculo()
-    {
-        status = false;
-        coordenadaAtual[0] = 0.0;
-        coordenadaAtual[1] = 0.0;
-        strcpy(placa, "");
-        strcpy(modelo, "");
-    }
-
-    void exibirVeiculo()
-    {
-        cout << "Placa: " << getPlaca() << endl;
-        cout << "Modelo: " << getModelo() << endl;
-        cout << "Status: " << getStatus() << endl;
-        cout << "Localizacao: X: " << getPosicaoAtualVeiculoX()
-             << " Y: " << getPosicaoAtualVeiculoY() << endl;
-    }
-    void iniciarEntrega() { this->status = 1; }
-    void finalizarEntrega(double coordenadaDestino[2])
-    {
-        this->status = 0;
-        this->coordenadaAtual[0] = coordenadaDestino[0];
-        this->coordenadaAtual[1] = coordenadaDestino[1];
-    }
-
-private:
-    double coordenadaAtual[2];
-    bool status;
-    char placa[20];
-    char modelo[20];
-};
-
-void cadastrarVeiculo(Veiculo *veiculos[], int &quantidade)
-{
-    double coordenadaX, coordenadaY;
-    if (quantidade >= 100)
-    {
-        cout << "Limite de veiculos atingido.\n";
-        return;
-    }
-
-    char placa[20], modelo[20];
-
-    cout << "Digite a placa do veiculo: ";
-
-    cin >> placa;
-
-    cout << "Digite o modelo do veiculo: ";
-    cin >> modelo;
-
-    cout << "Digite as coordenadas de onde o veiculo esta saindo: ";
-    cin >> coordenadaX;
-    cin >> coordenadaY;
-
-    veiculos[quantidade] = new Veiculo();
-    veiculos[quantidade]->setPlacaNova(placa);
-    veiculos[quantidade]->setModelo(modelo);
-    veiculos[quantidade]->setPosicaoVeiculo(coordenadaX, coordenadaY);
-    quantidade++;
-
-    cout << "Veiculo cadastrado com sucesso.\n";
-}
-
-void atualizarVeiculo(Veiculo *veiculos[], int quantidade)
-{
-    char placaProcurada[20];
-
-    cout << "Digite a placa do veiculo que voce deseja atualizar: ";
-    cin >> placaProcurada;
-    for (int i = 0; i < quantidade; i++)
-    {
-        if (strcmp(veiculos[i]->getPlaca(), placaProcurada) == 0)
-        {
-            cout << "Nova placa: ";
-            char novaPlaca[20];
-            cin.getline(novaPlaca, 20);
-            veiculos[i]->setPlacaNova(novaPlaca);
-            cout << "Placa atualizada com sucesso.\n";
-            return;
-        }
-    }
-    cout << "Veiculo placa " << placaProcurada << " nao encontrado.\n";
-}
-
-void excluirVeiculo(Veiculo *veiculos[], int &quantidade)
-{
-    char placaProcurada[20];
-
-    cout << "Digite a placa do veiculo que voce deseja atualizar: ";
-    cin >> placaProcurada;
-    for (int i = 0; i < quantidade; i++)
-    {
-        if (strcmp(veiculos[i]->getPlaca(), placaProcurada) == 0)
-        {
-            delete veiculos[i];
-            for (int j = i; j < quantidade - 1; j++)
-            {
-                veiculos[j] = veiculos[j + 1];
-            }
-            quantidade--;
-            cout << "Veiculo removido com sucesso.\n";
-            return;
-        }
-    }
-    cout << "Veiculo nao encontrado.\n";
-}
-
-void listarVeiculos(Veiculo *veiculos[], int quantidade)
-{
-    if (quantidade == 0)
-    {
-        cout << "Nenhum veiculo cadastrado.\n";
-        return;
-    }
-
-    for (int i = 0; i < quantidade; i++)
-    {
-        veiculos[i]->exibirVeiculo();
-    }
-}
-
 class CentroDistribuicao
 {
 public:
@@ -303,6 +143,184 @@ void atualizarCentro(CentroDistribuicao *centros[], int quantidade)
     cout << "Centro com nome \"" << nomeProcurado << "\" nao encontrado.\n";
 }
 
+class Veiculo
+{
+public:
+    CentroDistribuicao *getLocalAtual()
+    {
+        return localAtual;
+    }
+    void setLocalAtual(CentroDistribuicao *novoLocal)
+    {
+        localAtual = novoLocal;
+    }
+    bool getStatus()
+    {
+        return status;
+    }
+    char *getPlaca()
+    {
+        return placa;
+    }
+    void setPlacaNova(char *placaNova)
+    {
+        strncpy(placa, placaNova, sizeof(placa) - 1);
+        placa[sizeof(placa) - 1] = '\0';
+    }
+    char *getModelo()
+    {
+        return modelo;
+    }
+    void setModelo(const char *modeloNovo)
+    {
+        strncpy(modelo, modeloNovo, sizeof(modelo) - 1);
+        modelo[sizeof(modelo) - 1] = '\0';
+    }
+    Veiculo()
+    {
+        status = false;
+        localAtual = nullptr;
+        strcpy(placa, "");
+        strcpy(modelo, "");
+    }
+
+    void exibirVeiculo()
+    {
+        cout << "Placa: " << getPlaca() << endl;
+        cout << "Modelo: " << getModelo() << endl;
+        cout << "Status: " << getStatus() << endl;
+        if (localAtual != nullptr)
+        {
+            cout << "Localizacao: " << localAtual->getNomeLocal()
+                 << " (" << localAtual->getOrigemX()
+                 << ", " << localAtual->getOrigemY() << ")" << endl;
+        }
+        else
+        {
+            cout << "Localizacao: N/A\n";
+        }
+    }
+    void iniciarEntrega() { this->status = 1; }
+    void finalizarEntrega(CentroDistribuicao *destino)
+    {
+        this->status = false;
+        this->setLocalAtual(destino);
+    }
+
+private:
+    CentroDistribuicao *localAtual;
+    bool status;
+    char placa[20];
+    char modelo[20];
+};
+
+void cadastrarVeiculo(Veiculo *veiculos[], int &quantidade, CentroDistribuicao *centros[], int qtdCentros)
+{
+    if (quantidade >= 100)
+    {
+        cout << "Limite de veiculos atingido.\n";
+        return;
+    }
+
+    if (qtdCentros == 0)
+    {
+        cout << "Nenhum centro de distribuição cadastrado. Cadastre um centro antes de adicionar veículos.\n";
+        return;
+    }
+
+    char placa[20], modelo[20];
+
+    cout << "Digite a placa do veiculo: ";
+    cin >> placa;
+
+    cout << "Digite o modelo do veiculo: ";
+    cin >> modelo;
+
+    cout << "\nCentros de distribuição disponíveis:\n";
+    for (int i = 0; i < qtdCentros; i++)
+    {
+        cout << i + 1 << ". ";
+        centros[i]->exibirCentro();
+    }
+
+    int opcaoCentro;
+    cout << "Escolha o número do centro onde o veículo está: ";
+    cin >> opcaoCentro;
+
+    if (opcaoCentro < 1 || opcaoCentro > qtdCentros)
+    {
+        cout << "Opção inválida. Veículo não cadastrado.\n";
+        return;
+    }
+
+    veiculos[quantidade] = new Veiculo();
+    veiculos[quantidade]->setPlacaNova(placa);
+    veiculos[quantidade]->setModelo(modelo);
+    veiculos[quantidade]->setLocalAtual(centros[opcaoCentro - 1]);
+
+    quantidade++;
+
+    cout << "Veiculo cadastrado com sucesso.\n";
+}
+
+void atualizarVeiculo(Veiculo *veiculos[], int quantidade)
+{
+    char placaProcurada[20];
+
+    cout << "Digite a placa do veiculo que voce deseja atualizar: ";
+    cin >> placaProcurada;
+    for (int i = 0; i < quantidade; i++)
+    {
+        if (strcmp(veiculos[i]->getPlaca(), placaProcurada) == 0)
+        {
+            cout << "Nova placa: ";
+            char novaPlaca[20];
+            cin.getline(novaPlaca, 20);
+            veiculos[i]->setPlacaNova(novaPlaca);
+            cout << "Placa atualizada com sucesso.\n";
+            return;
+        }
+    }
+    cout << "Veiculo placa " << placaProcurada << " nao encontrado.\n";
+}
+
+void excluirVeiculo(Veiculo *veiculos[], int &quantidade)
+{
+    char placaProcurada[20];
+
+    cout << "Digite a placa do veiculo que voce deseja atualizar: ";
+    cin >> placaProcurada;
+    for (int i = 0; i < quantidade; i++)
+    {
+        if (strcmp(veiculos[i]->getPlaca(), placaProcurada) == 0)
+        {
+            delete veiculos[i];
+            for (int j = i; j < quantidade - 1; j++)
+            {
+                veiculos[j] = veiculos[j + 1];
+            }
+            quantidade--;
+            cout << "Veiculo removido com sucesso.\n";
+            return;
+        }
+    }
+    cout << "Veiculo nao encontrado.\n";
+}
+
+void listarVeiculos(Veiculo *veiculos[], int quantidade)
+{
+    if (quantidade == 0)
+    {
+        cout << "Nenhum veiculo cadastrado.\n";
+        return;
+    }
+
+    for (int i = 0; i < quantidade; i++)
+    {
+        veiculos[i]->exibirVeiculo();
+    }
+}
+
 class Pedido
 {
 public:
@@ -344,6 +362,11 @@ public:
         coordenadaDestino[0] = x;
         coordenadaDestino[1] = y;
     }
+    void setDestinoCentro(CentroDistribuicao *centro)
+    {
+        destino = centro;
+        setDestino(centro->getOrigemX(), centro->getOrigemY());
+    }
 
     void setPeso(double novoPeso)
     {
@@ -353,6 +376,7 @@ public:
     {
         return origem;
     }
+    CentroDistribuicao *getDestinoCentro() const { return destino; }
 
     void setOrigem(CentroDistribuicao *novoCentro)
     {
@@ -362,32 +386,58 @@ public:
     Veiculo *AcharVeiculoMaisProximo(Veiculo *veiculos[], int quantidade)
     {
         double distanciaMinima = 999999.9;
-        Veiculo *veiculosMaisProximo = nullptr;
+        Veiculo *veiculoMaisProximo = nullptr;
 
         for (int i = 0; i < quantidade; i++)
         {
             Veiculo *veiculo = veiculos[i];
-            double distanciaCalculada = calcularDistanciaEntreDoisPontos(coordenadaDestino[0], coordenadaDestino[1], veiculo->getPosicaoAtualVeiculoX(), veiculo->getPosicaoAtualVeiculoY());
 
-            if (distanciaCalculada < distanciaMinima)
+            // Ignora veículos ocupados
+            if (!veiculo->getStatus())
             {
-                distanciaMinima = distanciaCalculada;
-                veiculosMaisProximo = veiculo;
-                this->veiculoMaisProximo = veiculo;
+                CentroDistribuicao *localVeiculo = veiculo->getLocalAtual();
+
+                // Verifica se o local atual está definido
+                if (localVeiculo == nullptr)
+                    continue;
+
+                double distanciaCalculada = calcularDistanciaEntreDoisPontos(
+                    coordenadaDestino[0], coordenadaDestino[1],
+                    localVeiculo->getOrigemX(), localVeiculo->getOrigemY());
+
+                if (distanciaCalculada < distanciaMinima)
+                {
+                    distanciaMinima = distanciaCalculada;
+                    veiculoMaisProximo = veiculo;
+                    this->veiculoMaisProximo = veiculo;
+                }
             }
         }
-        return veiculosMaisProximo;
+
+        return veiculoMaisProximo;
     }
 
     void exibirPedido()
     {
+        cout << "-------------------------------\n";
+        cout << "ID do Pedido: " << getIdUnico() << endl;
+
         if (origem != nullptr)
         {
-            cout << "Origem: " << origem->getNomeLocal() << endl;
+            cout << "Origem: " << origem->getNomeLocal()
+                 << " (" << origem->getOrigemX()
+                 << ", " << origem->getOrigemY() << ")\n";
         }
-        cout << "Id: " << getIdUnico() << endl;
-        cout << "Coordenadas: X: " << getDestinoX() << " Y: " << getDestinoY() << endl;
-        cout << "Peso: " << getPeso() << endl;
+
+        if (destino != nullptr)
+        {
+            cout << "Destino: " << destino->getNomeLocal()
+                 << " (" << getDestinoX()
+                 << ", " << getDestinoY() << ")\n";
+        }
+
+        cout << "Peso: " << getPeso() << " kg\n";
+        cout << "-------------------------------\n";
     }
 
     void atualizarPedido(Pedido *pedidos[], int quantidade)
@@ -425,6 +475,7 @@ private:
     char idUnico[20];
     double pesoDoItem;
     CentroDistribuicao *origem;
+    CentroDistribuicao *destino;
     Veiculo *veiculoMaisProximo;
     double calcularDistanciaEntreDoisPontos(double x1, double y1, double x2, double y2) { return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)); }
     void acharCentroDeDistribuicaoMaisProximo(CentroDistribuicao *centros[], int quantidade)
@@ -447,7 +498,6 @@ private:
 };
 
 void criarPedido(Pedido *pedidos[], int &quantidade, CentroDistribuicao *centros[], int qtdCentros)
-
 {
     if (quantidade >= 100)
     {
@@ -463,12 +513,13 @@ void criarPedido(Pedido *pedidos[], int &quantidade, CentroDistribuicao *centros
     Pedido *novoPedido = new Pedido();
 
     char id[20];
-    double x, y, peso;
+    double peso;
 
     cout << "Digite o ID do pedido: ";
     cin.ignore();
     cin.getline(id, 20);
 
+    // Escolher centro de origem
     cout << "\nCentros de distribuição disponíveis:\n";
     for (int i = 0; i < qtdCentros; i++)
     {
@@ -476,28 +527,48 @@ void criarPedido(Pedido *pedidos[], int &quantidade, CentroDistribuicao *centros
         centros[i]->exibirCentro();
     }
 
-    int opcao;
-    cout << "Escolha o número do centro de origem: ";
-    cin >> opcao;
+    int opcaoOrigem;
+    cout << "Escolha o número do centro de ORIGEM: ";
+    cin >> opcaoOrigem;
 
-    if (opcao < 1 || opcao > qtdCentros)
+    if (opcaoOrigem < 1 || opcaoOrigem > qtdCentros)
     {
         cout << "Opção inválida. Pedido cancelado.\n";
         delete novoPedido;
         return;
     }
 
-    CentroDistribuicao *centroOrigem = centros[opcao - 1];
+    CentroDistribuicao *centroOrigem = centros[opcaoOrigem - 1];
     novoPedido->setOrigem(centroOrigem);
 
-    cout << "Digite as coordenadas de destino (X e Y): ";
-    cin >> x >> y;
+    // Escolher centro de destino
+    int opcaoDestino;
+    cout << "Escolha o número do centro de DESTINO: ";
+    cin >> opcaoDestino;
+
+    if (opcaoDestino < 1 || opcaoDestino > qtdCentros)
+    {
+        cout << "Opção inválida. Pedido cancelado.\n";
+        delete novoPedido;
+        return;
+    }
+
+    CentroDistribuicao *centroDestino = centros[opcaoDestino - 1];
+
+    if (centroOrigem == centroDestino)
+
+    {
+        cout << "Origem e destino não podem ser o mesmo centro.\n";
+        delete novoPedido;
+        return;
+    }
+
+    novoPedido->setDestinoCentro(centroDestino);
 
     cout << "Digite o peso do item: ";
     cin >> peso;
 
     novoPedido->setIdUnico(id);
-    novoPedido->setDestino(x, y);
     novoPedido->setPeso(peso);
 
     pedidos[quantidade] = novoPedido;
@@ -553,6 +624,53 @@ void listarPedido(Pedido *pedidos[], int quantidade)
         pedidos[i]->exibirPedido();
     }
 }
+void simularEntrega(Pedido *pedidos[], int qtdPedidos, Veiculo *veiculos[], int qtdVeiculos)
+{
+    if (qtdPedidos == 0)
+    {
+        cout << "Nenhum pedido cadastrado!" << endl;
+        return;
+    }
+
+    char id[20];
+    cout << "Digite o id do pedido a ser entregue: ";
+    cin.ignore();
+    cin.getline(id, 20);
+
+    Pedido *pedidoSelecionado = nullptr;
+    for (int i = 0; i < qtdPedidos; i++)
+    {
+        if (strcmp(pedidos[i]->getIdUnico(), id) == 0)
+        {
+            pedidoSelecionado = pedidos[i];
+            break;
+        }
+    }
+
+    if (pedidoSelecionado == nullptr)
+    {
+        cout << "Nenhum pedido encontrado.\n";
+        return;
+    }
+
+    Veiculo *veiculo = pedidoSelecionado->AcharVeiculoMaisProximo(veiculos, qtdVeiculos);
+
+    if (veiculo == nullptr)
+    {
+        cout << "Nenhum veiculo encontrado.\n";
+        return;
+    }
+
+    veiculo->iniciarEntrega();
+    veiculo->finalizarEntrega(pedidoSelecionado->getDestinoCentro());
+
+    cout << "Entrega realizada com sucesso pelo veiculo de placa: " << veiculo->getPlaca() << endl;
+    CentroDistribuicao* local = veiculo->getLocalAtual();
+    cout << "Veiculo agora está disponível e na nova posição: "
+         << local->getNomeLocal() << " (" << local->getOrigemX()
+         << ", " << local->getOrigemY() << ")\n";
+}
+
 
 int main()
 {
@@ -577,6 +695,7 @@ int main()
         cout << "10. Atualizar Pedido" << endl;
         cout << "11. Excluir Pedido" << endl;
         cout << "12. Listar Pedidos" << endl;
+        cout << "13. Simular Entrega" << endl;
         cout << "0. Sair" << endl;
         cout << "Escolha uma opcao: ";
         cin >> opcao;
@@ -584,7 +703,7 @@ int main()
         switch (opcao)
         {
         case 1:
-            cadastrarVeiculo(veiculos, qtdVeiculos);
+            cadastrarVeiculo(veiculos, qtdVeiculos, centros, qtdCentros);
             break;
         case 2:
             atualizarVeiculo(veiculos, qtdVeiculos);
@@ -621,6 +740,9 @@ int main()
             break;
         case 12:
             listarPedido(pedidos, qtdPedidos);
+            break;
+        case 13:
+            simularEntrega(pedidos, qtdPedidos, veiculos, qtdVeiculos);
             break;
         case 0:
             cout << "Encerrando programa...\n";
