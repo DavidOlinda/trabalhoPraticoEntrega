@@ -239,13 +239,18 @@ void cadastrarCentro(CentroDistribuicao *centros[], int &quantidade)
     cout << "Centro cadastrado com sucesso.\n";
 }
 
-void listarCentros(CentroDistribuicao *centros, int quantidade)
+void listarCentros(CentroDistribuicao *centros[], int quantidade)
 {
+    if (quantidade == 0)
+    {
+        cout << "Nenhum centro cadastrado.\n";
+        return;
+    }
 
     for (int i = 0; i < quantidade; i++)
     {
-        cout << "Centro [" << i + 1 << "]";
-        centros[i].exibirCentro();
+        cout << "Centro [" << i + 1 << "]\n";
+        centros[i]->exibirCentro();
     }
 }
 
@@ -344,6 +349,15 @@ public:
     {
         pesoDoItem = novoPeso;
     }
+    CentroDistribuicao *getOrigem() const
+    {
+        return origem;
+    }
+
+    void setOrigem(CentroDistribuicao *novoCentro)
+    {
+        origem = novoCentro;
+    }
 
     Veiculo *AcharVeiculoMaisProximo(Veiculo *veiculos[], int quantidade)
     {
@@ -367,6 +381,10 @@ public:
 
     void exibirPedido()
     {
+        if (origem != nullptr)
+        {
+            cout << "Origem: " << origem->getNomeLocal() << endl;
+        }
         cout << "Id: " << getIdUnico() << endl;
         cout << "Coordenadas: X: " << getDestinoX() << " Y: " << getDestinoY() << endl;
         cout << "Peso: " << getPeso() << endl;
@@ -428,11 +446,17 @@ private:
     }
 };
 
-void criarPedido(Pedido *pedidos[], int &quantidade)
+void criarPedido(Pedido *pedidos[], int &quantidade, CentroDistribuicao *centros[], int qtdCentros)
+
 {
     if (quantidade >= 100)
     {
         cout << "Limite de pedidos atingido.\n";
+        return;
+    }
+    if (qtdCentros == 0)
+    {
+        cout << "Nenhum centro cadastrado. Cadastre um centro primeiro.\n";
         return;
     }
 
@@ -444,6 +468,27 @@ void criarPedido(Pedido *pedidos[], int &quantidade)
     cout << "Digite o ID do pedido: ";
     cin.ignore();
     cin.getline(id, 20);
+
+    cout << "\nCentros de distribuição disponíveis:\n";
+    for (int i = 0; i < qtdCentros; i++)
+    {
+        cout << i + 1 << ". ";
+        centros[i]->exibirCentro();
+    }
+
+    int opcao;
+    cout << "Escolha o número do centro de origem: ";
+    cin >> opcao;
+
+    if (opcao < 1 || opcao > qtdCentros)
+    {
+        cout << "Opção inválida. Pedido cancelado.\n";
+        delete novoPedido;
+        return;
+    }
+
+    CentroDistribuicao *centroOrigem = centros[opcao - 1];
+    novoPedido->setOrigem(centroOrigem);
 
     cout << "Digite as coordenadas de destino (X e Y): ";
     cin >> x >> y;
@@ -494,13 +539,18 @@ void excluirPedido(Pedido *pedidos[], int &quantidade)
     cout << "Pedido com ID \"" << idProcurado << "\" nao encontrado.\n";
 }
 
-void listarPedido(Pedido *pedidos, int quantidade)
+void listarPedido(Pedido *pedidos[], int quantidade)
 {
+    if (quantidade == 0)
+    {
+        cout << "Nenhum pedido cadastrado.\n";
+        return;
+    }
 
     for (int i = 0; i < quantidade; i++)
     {
-        cout << "Pedidos [" << i + 1 << "]";
-        pedidos[i].exibirPedido();
+        cout << "Pedido [" << i + 1 << "]\n";
+        pedidos[i]->exibirPedido();
     }
 }
 
@@ -555,10 +605,10 @@ int main()
             excluirCentro(centros, qtdCentros);
             break;
         case 8:
-            listarCentros(*centros, qtdCentros);
+            listarCentros(centros, qtdCentros);
             break;
         case 9:
-            criarPedido(pedidos, qtdPedidos);
+            criarPedido(pedidos, qtdPedidos, centros, qtdCentros);
             break;
         case 10:
         {
@@ -570,7 +620,7 @@ int main()
             excluirPedido(pedidos, qtdPedidos);
             break;
         case 12:
-            listarPedido(*pedidos, qtdPedidos);
+            listarPedido(pedidos, qtdPedidos);
             break;
         case 0:
             cout << "Encerrando programa...\n";
