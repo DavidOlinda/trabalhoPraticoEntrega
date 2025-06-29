@@ -59,8 +59,7 @@ void cadastrarCentro(CentroDistribuicao *centros[], int &quantidade)
     double x, y;
 
     cout << "Digite o nome do centro: ";
-    cin.ignore();
-    cin.getline(nome, 20);
+    cin >> nome;
 
     cout << "Digite a coordenada X: ";
     cin >> x;
@@ -99,8 +98,7 @@ void excluirCentro(CentroDistribuicao *centros[], int &quantidade)
 
     char nomeProcurado[20];
     cout << "Digite o nome do centro que deseja excluir: ";
-    cin.ignore();
-    cin.getline(nomeProcurado, 20);
+    cin >> nomeProcurado;
 
     for (int i = 0; i < quantidade; i++)
     {
@@ -124,8 +122,7 @@ void atualizarCentro(CentroDistribuicao *centros[], int quantidade)
     char nomeProcurado[20];
 
     cout << "Digite o nome do centro que deseja atualizar: ";
-    cin.ignore();
-    cin.getline(nomeProcurado, 20);
+    cin >> nomeProcurado;
 
     for (int i = 0; i < quantidade; i++)
     {
@@ -133,7 +130,7 @@ void atualizarCentro(CentroDistribuicao *centros[], int quantidade)
         {
             char novoNome[20];
             cout << "Digite o novo nome do centro: ";
-            cin.getline(novoNome, 20);
+            cin >> novoNome;
             centros[i]->setNovoLocal(novoNome);
             cout << "Centro atualizado com sucesso.\n";
             return;
@@ -188,7 +185,15 @@ public:
     {
         cout << "Placa: " << getPlaca() << endl;
         cout << "Modelo: " << getModelo() << endl;
-        cout << "Status: " << getStatus() << endl;
+        if (this->status == 0)
+        {
+            cout << "Status: Livre" << endl;
+        }
+        else
+        {
+            cout << "Status: Ocupado" << endl;
+        }
+
         if (localAtual != nullptr)
         {
             cout << "Localizacao: " << localAtual->getNomeLocal()
@@ -275,7 +280,7 @@ void atualizarVeiculo(Veiculo *veiculos[], int quantidade)
         {
             cout << "Nova placa: ";
             char novaPlaca[20];
-            cin.getline(novaPlaca, 20);
+            cin >> novaPlaca;
             veiculos[i]->setPlacaNova(novaPlaca);
             cout << "Placa atualizada com sucesso.\n";
             return;
@@ -416,7 +421,10 @@ public:
 
         return veiculoMaisProximo;
     }
-
+    Veiculo *getVeiculoMaisProximo()
+    {
+        return veiculoMaisProximo;
+    }
     void exibirPedido()
     {
         cout << "-------------------------------\n";
@@ -445,8 +453,7 @@ public:
         char idProcurado[20];
 
         cout << "Digite o ID do pedido que deseja atualizar: ";
-        cin.ignore();
-        cin.getline(idProcurado, 20);
+        cin >> idProcurado;
 
         for (int i = 0; i < quantidade; i++)
         {
@@ -516,8 +523,7 @@ void criarPedido(Pedido *pedidos[], int &quantidade, CentroDistribuicao *centros
     double peso;
 
     cout << "Digite o ID do pedido: ";
-    cin.ignore();
-    cin.getline(id, 20);
+    cin >> id;
 
     // Escolher centro de origem
     cout << "\nCentros de distribuição disponíveis:\n";
@@ -587,8 +593,7 @@ void excluirPedido(Pedido *pedidos[], int &quantidade)
 
     char idProcurado[20];
     cout << "Digite o ID do pedido que deseja excluir: ";
-    cin.ignore();
-    cin.getline(idProcurado, 20);
+    cin >> idProcurado;
 
     for (int i = 0; i < quantidade; i++)
     {
@@ -633,9 +638,8 @@ void simularEntrega(Pedido *pedidos[], int qtdPedidos, Veiculo *veiculos[], int 
     }
 
     char id[20];
-    cout << "Digite o id do pedido a ser entregue: ";
-    cin.ignore();
-    cin.getline(id, 20);
+    cout << "Digite o id do pedido a ser simulado: ";
+    cin >> id;
 
     Pedido *pedidoSelecionado = nullptr;
     for (int i = 0; i < qtdPedidos; i++)
@@ -657,20 +661,208 @@ void simularEntrega(Pedido *pedidos[], int qtdPedidos, Veiculo *veiculos[], int 
 
     if (veiculo == nullptr)
     {
-        cout << "Nenhum veiculo encontrado.\n";
+        cout << "Nenhum veiculo disponível encontrado.\n";
+        return;
+    }
+
+    cout << "Simulação realizada com sucesso." << endl;
+    cout << "Veículo mais próximo: " << veiculo->getPlaca() << " no centro " << veiculo->getLocalAtual()->getNomeLocal() << endl;
+    cout << "Destino do pedido: " << pedidoSelecionado->getDestinoCentro()->getNomeLocal() << endl;
+}
+
+void iniciarEntregaManual(Pedido *pedidos[], int qtdPedidos, Veiculo *veiculos[], int qtdVeiculos)
+{
+    if (qtdPedidos == 0)
+    {
+        cout << "Nenhum pedido cadastrado.\n";
+        return;
+    }
+
+    char id[20];
+    cout << "Digite o ID do pedido que deseja entregar: ";
+    cin >> id;
+
+    Pedido *pedidoSelecionado = nullptr;
+    for (int i = 0; i < qtdPedidos; i++)
+    {
+        if (strcmp(pedidos[i]->getIdUnico(), id) == 0)
+        {
+            pedidoSelecionado = pedidos[i];
+            break;
+        }
+    }
+
+    if (pedidoSelecionado == nullptr)
+    {
+        cout << "Pedido não encontrado.\n";
+        return;
+    }
+
+    Veiculo *veiculo = pedidoSelecionado->AcharVeiculoMaisProximo(veiculos, qtdVeiculos);
+
+    if (veiculo == nullptr)
+    {
+        cout << "Nenhum veículo disponível para realizar a entrega.\n";
         return;
     }
 
     veiculo->iniciarEntrega();
-    veiculo->finalizarEntrega(pedidoSelecionado->getDestinoCentro());
-
-    cout << "Entrega realizada com sucesso pelo veiculo de placa: " << veiculo->getPlaca() << endl;
-    CentroDistribuicao* local = veiculo->getLocalAtual();
-    cout << "Veiculo agora está disponível e na nova posição: "
-         << local->getNomeLocal() << " (" << local->getOrigemX()
-         << ", " << local->getOrigemY() << ")\n";
+    cout << "Entrega iniciada com sucesso!\n";
+    cout << "Veículo " << veiculo->getPlaca() << " realizará a entrega para o destino: "
+         << pedidoSelecionado->getDestinoCentro()->getNomeLocal() << endl;
 }
 
+void finalizarEntregaManual(Pedido *pedidos[], int qtdPedidos, Veiculo *veiculos[], int qtdVeiculos)
+{
+    if (qtdPedidos == 0)
+    {
+        cout << "Nenhum pedido cadastrado.\n";
+        return;
+    }
+
+    char id[20];
+    cout << "Digite o ID do pedido entregue: ";
+
+    cin >> id;
+
+    Pedido *pedidoSelecionado = nullptr;
+    for (int i = 0; i < qtdPedidos; i++)
+    {
+        if (strcmp(pedidos[i]->getIdUnico(), id) == 0)
+        {
+            pedidoSelecionado = pedidos[i];
+            break;
+        }
+    }
+
+    if (pedidoSelecionado == nullptr)
+    {
+        cout << "Pedido não encontrado.\n";
+        return;
+    }
+
+    Veiculo *veiculo = pedidoSelecionado->getVeiculoMaisProximo();
+
+    if (veiculo == nullptr || !veiculo->getStatus())
+    {
+        cout << "Veículo não encontrado ou não está em entrega.\n";
+        return;
+    }
+
+    veiculo->finalizarEntrega(pedidoSelecionado->getDestinoCentro());
+
+    cout << "Entrega finalizada com sucesso.\n";
+    cout << "Veículo " << veiculo->getPlaca() << " agora está disponível no centro "
+         << pedidoSelecionado->getDestinoCentro()->getNomeLocal() << endl;
+}
+void fazerBackup(Veiculo *veiculos[], int qtdVeiculos, CentroDistribuicao *centros[], int qtdCentros, Pedido *pedidos[], int qtdPedidos)
+{
+    // Backup dos centros
+    FILE *arqCentro = fopen("centros.bin", "wb");
+    fwrite(&qtdCentros, sizeof(int), 1, arqCentro);
+    for (int i = 0; i < qtdCentros; i++)
+    {
+        fwrite(centros[i], sizeof(CentroDistribuicao), 1, arqCentro);
+    }
+    fclose(arqCentro);
+
+    // Backup dos veículos
+    FILE *arqVeiculo = fopen("veiculos.bin", "wb");
+    fwrite(&qtdVeiculos, sizeof(int), 1, arqVeiculo);
+    for (int i = 0; i < qtdVeiculos; i++)
+    {
+        fwrite(veiculos[i], sizeof(Veiculo), 1, arqVeiculo);
+
+        // Salvar o índice do centro onde o veículo está
+        for (int j = 0; j < qtdCentros; j++)
+        {
+            if (veiculos[i]->getLocalAtual() == centros[j])
+            {
+                fwrite(&j, sizeof(int), 1, arqVeiculo);
+                break;
+            }
+        }
+    }
+    fclose(arqVeiculo);
+
+    // Backup dos pedidos
+    FILE *arqPedido = fopen("pedidos.bin", "wb");
+    fwrite(&qtdPedidos, sizeof(int), 1, arqPedido);
+    for (int i = 0; i < qtdPedidos; i++)
+    {
+        fwrite(pedidos[i], sizeof(Pedido), 1, arqPedido);
+
+        int origemIndex = -1, destinoIndex = -1;
+        for (int j = 0; j < qtdCentros; j++)
+        {
+            if (pedidos[i]->getOrigem() == centros[j])
+                origemIndex = j;
+            if (pedidos[i]->getDestinoCentro() == centros[j])
+                destinoIndex = j;
+        }
+        fwrite(&origemIndex, sizeof(int), 1, arqPedido);
+        fwrite(&destinoIndex, sizeof(int), 1, arqPedido);
+    }
+    fclose(arqPedido);
+
+    cout << "Backup concluído com sucesso!\n";
+}
+void restaurarBackup(Veiculo *veiculos[], int &qtdVeiculos, CentroDistribuicao *centros[], int &qtdCentros, Pedido *pedidos[], int &qtdPedidos)
+{
+    // Restaurar centros
+    FILE *arqCentro = fopen("centros.bin", "rb");
+    if (!arqCentro)
+    {
+        cout << "Arquivo de centros não encontrado.\n";
+        return;
+    }
+
+    fread(&qtdCentros, sizeof(int), 1, arqCentro);
+    for (int i = 0; i < qtdCentros; i++)
+    {
+        centros[i] = new CentroDistribuicao();
+        fread(centros[i], sizeof(CentroDistribuicao), 1, arqCentro);
+    }
+    fclose(arqCentro);
+
+    // Restaurar veículos
+    FILE *arqVeiculo = fopen("veiculos.bin", "rb");
+    fread(&qtdVeiculos, sizeof(int), 1, arqVeiculo);
+    for (int i = 0; i < qtdVeiculos; i++)
+    {
+        veiculos[i] = new Veiculo();
+        fread(veiculos[i], sizeof(Veiculo), 1, arqVeiculo);
+
+        int centroIndex;
+        fread(&centroIndex, sizeof(int), 1, arqVeiculo);
+        if (centroIndex >= 0 && centroIndex < qtdCentros)
+        {
+            veiculos[i]->setLocalAtual(centros[centroIndex]);
+        }
+    }
+    fclose(arqVeiculo);
+
+    // Restaurar pedidos
+    FILE *arqPedido = fopen("pedidos.bin", "rb");
+    fread(&qtdPedidos, sizeof(int), 1, arqPedido);
+    for (int i = 0; i < qtdPedidos; i++)
+    {
+        pedidos[i] = new Pedido();
+        fread(pedidos[i], sizeof(Pedido), 1, arqPedido);
+
+        int origemIndex, destinoIndex;
+        fread(&origemIndex, sizeof(int), 1, arqPedido);
+        fread(&destinoIndex, sizeof(int), 1, arqPedido);
+
+        if (origemIndex >= 0 && origemIndex < qtdCentros)
+            pedidos[i]->setOrigem(centros[origemIndex]);
+        if (destinoIndex >= 0 && destinoIndex < qtdCentros)
+            pedidos[i]->setDestinoCentro(centros[destinoIndex]);
+    }
+    fclose(arqPedido);
+
+    cout << "Backup restaurado com sucesso!\n";
+}
 
 int main()
 {
@@ -678,6 +870,7 @@ int main()
     CentroDistribuicao *centros[100];
     Pedido *pedidos[100];
     int qtdVeiculos = 0, qtdCentros = 0, qtdPedidos = 0;
+    restaurarBackup(veiculos, qtdVeiculos, centros, qtdCentros, pedidos, qtdPedidos);
 
     int opcao;
     do
@@ -696,6 +889,9 @@ int main()
         cout << "11. Excluir Pedido" << endl;
         cout << "12. Listar Pedidos" << endl;
         cout << "13. Simular Entrega" << endl;
+        cout << "14. Iniciar Entrega Manualmente" << endl;
+        cout << "15. Finalizar Entrega Manualmente" << endl;
+
         cout << "0. Sair" << endl;
         cout << "Escolha uma opcao: ";
         cin >> opcao;
@@ -744,8 +940,18 @@ int main()
         case 13:
             simularEntrega(pedidos, qtdPedidos, veiculos, qtdVeiculos);
             break;
+        case 14:
+            iniciarEntregaManual(pedidos, qtdPedidos, veiculos, qtdVeiculos);
+            break;
+
+        case 15:
+            finalizarEntregaManual(pedidos, qtdPedidos, veiculos, qtdVeiculos);
+            break;
+
         case 0:
             cout << "Encerrando programa...\n";
+            fazerBackup(veiculos, qtdVeiculos, centros, qtdCentros, pedidos, qtdPedidos);
+
             break;
         default:
             cout << "Opcao invalida.\n";
