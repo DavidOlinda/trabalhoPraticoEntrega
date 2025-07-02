@@ -62,11 +62,43 @@ void cadastrarCentro(CentroDistribuicao *centros[], int &quantidade) // funcao p
     cout << "Digite o nome do centro: ";
     cin >> nome;
 
+    // verifica se o nome digitado é apenas numerico
+    bool apenasNumeros = true;
+    for (int i = 0; nome[i] != '\0'; i++)
+    {
+        if (!isdigit(nome[i]))
+        {
+            apenasNumeros = false;
+            break;
+        }
+    }
+    if (apenasNumeros)
+    {
+        cout << "Erro: O nome do centro nao pode ser apenas numeros.\n";
+        return;
+    }
+    
+
     cout << "Digite a coordenada X: ";
     cin >> x;
 
     cout << "Digite a coordenada Y: ";
     cin >> y;
+
+    // verifica se ja existe centro com mesmo nome ou coordenadas
+    for (int i = 0; i < quantidade; i++)
+    {
+        if (strcmp(centros[i]->getNomeLocal(), nome) == 0)
+        {
+            cout << "Erro: Ja existe um centro com esse nome.\n";
+            return;
+        }
+        if (centros[i]->getOrigemX() == x && centros[i]->getOrigemY() == y)
+        {
+            cout << "Erro: Ja existe um centro com essas coordenadas.\n";
+            return;
+        }
+    }
 
     CentroDistribuicao *novoCentro = new CentroDistribuicao(); // cria um novo centro dinamicamente
     novoCentro->setNovoLocal(nome);                            // define o nome do novo centro de distribuição usando o valor digitado pelo usuário
@@ -78,6 +110,7 @@ void cadastrarCentro(CentroDistribuicao *centros[], int &quantidade) // funcao p
 
     cout << "Centro cadastrado com sucesso.\n";
 }
+
 
 void listarCentros(CentroDistribuicao *centros[], int quantidade) // função para listar os centros ja cadastrados, recebe os mesmo parametros tirando o quantidade pois aqui ja nao tera alteraçoes na quantidade existente
 {
@@ -553,7 +586,7 @@ void criarPedido(Pedido *pedidos[], int &quantidade, CentroDistribuicao *centros
 
     // escolher centro de destino
     int opcaoDestino;
-    cout << "Escolha o número do centro de DESTINO: ";
+    cout << "Escolha o numero do centro de DESTINO: ";
     cin >> opcaoDestino;
 
     if (opcaoDestino < 1 || opcaoDestino > qtdCentros) // verificar a opcao é valida ou nao
@@ -698,7 +731,7 @@ void iniciarEntregaManual(Pedido *pedidos[], int qtdPedidos, Veiculo *veiculos[]
 
     if (pedidoSelecionado == nullptr)
     {
-        cout << "Pedido não encontrado.\n";
+        cout << "Pedido nao encontrado.\n";
         return;
     }
 
@@ -756,7 +789,7 @@ void finalizarEntregaManual(Pedido *pedidos[], int qtdPedidos, Veiculo *veiculos
     veiculo->finalizarEntrega(pedidoSelecionado->getDestinoCentro()); // chama a funcao finalizar entrega assim que acaba
 
     cout << "Entrega finalizada com sucesso.\n";
-    cout << "Veiculo " << veiculo->getPlaca() << " agora está disponivel no centro "
+    cout << "Veiculo " << veiculo->getPlaca() << " agora esta disponivel no centro "
          << pedidoSelecionado->getDestinoCentro()->getNomeLocal() << endl;
 }
 void fazerBackup(Veiculo *veiculos[], int qtdVeiculos, CentroDistribuicao *centros[], int qtdCentros, Pedido *pedidos[], int qtdPedidos)
@@ -818,7 +851,7 @@ void restaurarBackup(Veiculo *veiculos[], int &qtdVeiculos, CentroDistribuicao *
     FILE *arqCentro = fopen("centros.bin", "rb"); // abre para leitura o centros.bin
     if (!arqCentro) // se arquivo nao existe 
     {
-        cout << "Arquivo de centros não encontrado.\n";
+        cout << "Arquivo de centros nao encontrado.\n";
         return;
     }
 
